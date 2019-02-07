@@ -12,6 +12,13 @@ function main(){
 	 mkdir -p $input.pro/{build,headers,sources}
 	 touch $input.pro/CMakeLists.txt
 	 touch $input.pro/sources/main.cpp 
+	 cd $input.pro
+	 	echo "cmake_minimum_required(VERSION 2.8.9)" >> CMakeLists.txt
+	 	echo "project($input)" >> CMakeLists.txt; echo "" >> CMakeLists.txt
+	 	echo "include_directories(headers)" >> CMakeLists.txt; echo "" >> CMakeLists.txt 
+	 	echo "file (GLOB SOURCES \"sources/*.cpp\")" >> CMakeLists.txt; echo "" >> CMakeLists.txt
+	 	echo "add_executable($input \${SOURCES})" >> CMakeLists.txt
+	 cd ..
 	 tree $input.pro
 	 ;;
       h) input="$OPTARG" 
