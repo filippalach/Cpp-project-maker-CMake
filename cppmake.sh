@@ -7,7 +7,7 @@ function main(){
   
   local OPTIND=1 opt 
 
-  while getopts ":p:h:" opt; do
+  while getopts "ep:h:" opt; do
     case $opt in 
       p) input="$OPTARG"
 	 if [ ! -d "$input.pro" ] 
@@ -26,11 +26,13 @@ function main(){
 		  echo "int main(){" >> main.cpp; echo "" >> main.cpp; echo "" >> main.cpp; echo "}" >> main.cpp
 	   cd ..; 
 	   tree 
-	   exec bash
+	   #exec bash
 	 else
 	   echo "This directory name already exists. Choose another name."
 	   exit $dir_exists
 	 fi
+	 ;;
+      e) exec bash
 	 ;;
       h) input="$OPTARG" 
 	 if [ ! -e headers/$input.h ] && [ ! -e sources/$input.cpp ] && [ -d headers ] && [ -d sources ]
@@ -54,6 +56,7 @@ function main(){
 function read_help(){
   echo "Error: Bad use of parameter"
   echo "Use -p for project making and -h for adding header"
+  echo "Add further -e after -p parameter to end in project dir; ex: cppmake.sh -p Dir -e"
 }
 
 main $@
