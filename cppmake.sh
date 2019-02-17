@@ -6,6 +6,7 @@ function main(){
   dir_exists=46
   
   local OPTIND=1 opt 
+  local cmake="CMakeLists.txt"
 
   while getopts "ep:h:" opt; do
     case $opt in 
@@ -16,11 +17,11 @@ function main(){
 	   touch $input.pro/CMakeLists.txt
 	   touch $input.pro/sources/main.cpp 
 	   cd $input.pro
-		  printf "cmake_minimum_required(VERSION 2.8.9)" >> CMakeLists.txt
-		  printf "\nproject($input)" >> CMakeLists.txt 
-		  printf "\ninclude_directories(headers)" >> CMakeLists.txt 
-		  printf "\nfile (GLOB SOURCES \"sources/*.cpp\")" >> CMakeLists.txt
-		  printf "\nadd_executable($input \${SOURCES})" >> CMakeLists.txt
+		  printf "cmake_minimum_required(VERSION 2.8.9)" >> $cmake 
+		  printf "\n\nproject($input)" >> $cmake
+		  printf "\n\ninclude_directories(headers)" >> $cmake
+		  printf "\n\nfile (GLOB SOURCES \"sources/*.cpp\")" >> $cmake
+		  printf "\n\nadd_executable($input \${SOURCES})" >> $cmake
 	   cd sources 
 		  printf "#include <iostream>" >> main.cpp
 		  printf "\n\nint main(){" >> main.cpp  
@@ -39,6 +40,7 @@ function main(){
 	 then
 	   cd headers
 	   : > $input.h
+	   printf "#pragma once" >> $input.h
 	   cd ..; cd sources
 	   : > $input.cpp
 	   printf "#include \"$input.h\"" >> $input.cpp
