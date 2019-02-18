@@ -2,13 +2,14 @@
 
 function main(){
 
-  class_exists=45
-  dir_exists=46
+  local class_exists=455
+  local dir_exists=466
+  local build_nxst=477
   
   local OPTIND=1 opt 
   local cmake="CMakeLists.txt"
 
-  while getopts "ep:h:" opt; do
+  while getopts "ep:h:m" opt; do
     case $opt in 
       p) input="$OPTARG"
 	 if [ ! -d "$input.pro" ] 
@@ -33,8 +34,10 @@ function main(){
 	   exit $dir_exists
 	 fi
 	 ;;
+
       e) exec bash
 	 ;;
+
       h) input="$OPTARG" 
 	 if [ ! -e headers/$input.h ] && [ ! -e sources/$input.cpp ] && [ -d headers ] && [ -d sources ]
 	 then
@@ -49,6 +52,23 @@ function main(){
 	   exit $class_exists 
 	 fi
 	 ;; 
+
+      m) path=`pwd`
+	 relpath=${path%.pro*}
+	 cd "$relpath.pro"
+	 if [ -d "build" ]
+	 then
+	   rm -r build/*
+	   cd build 
+	   cmake ..
+	   exec bash
+	   exit 0
+	 else	
+	   printf "The build dir does not exist. Are you in good dir?"
+	   exit "$build_nxst"
+	 fi
+	 ;;
+
       \?) read_help ;;
     esac
   done
