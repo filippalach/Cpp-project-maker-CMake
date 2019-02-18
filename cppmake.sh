@@ -5,25 +5,26 @@ function main(){
   local class_exists=455
   local dir_exists=466
   local build_nxst=477
+  local no_dir=488
   
   local OPTIND=1 opt 
   local cmake="CMakeLists.txt"
 
-  while getopts "ep:h:m" opt; do
+  while getopts "ep:h:mbr:" opt; do
     case $opt in 
       p) input="$OPTARG"
 	 if [ ! -d "$input.pro" ] 
 	 then
 	   mkdir -p $input.pro/{build,headers,sources}
-	   touch $input.pro/CMakeLists.txt
-	   touch $input.pro/sources/main.cpp 
 	   cd $input.pro
-		  printf "cmake_minimum_required(VERSION 2.8.9)" >> $cmake 
-		  printf "\n\nproject($input)" >> $cmake
-		  printf "\n\ninclude_directories(headers)" >> $cmake
-		  printf "\n\nfile (GLOB SOURCES \"sources/*.cpp\")" >> $cmake
-		  printf "\n\nadd_executable($input \${SOURCES})" >> $cmake
+	   : > "$cmake"
+		  printf "cmake_minimum_required(VERSION 2.8.9)" >> "$cmake"
+		  printf "\n\nproject($input)" >> "$cmake"
+		  printf "\n\ninclude_directories(headers)" >> "$cmake"
+		  printf "\n\nfile (GLOB SOURCES \"sources/*.cpp\")" >> "$cmake"
+		  printf "\n\nadd_executable($input \${SOURCES})" >> "$cmake"
 	   cd sources 
+	   : > main.cpp
 		  printf "#include <iostream>" >> main.cpp
 		  printf "\n\nint main(){" >> main.cpp  
 		  printf "\n\n\n}" >> main.cpp
@@ -67,6 +68,26 @@ function main(){
 	   printf "The build dir does not exist. Are you in good dir?"
 	   exit "$build_nxst"
 	 fi
+	 ;;
+
+      b) path=`pwd`
+	 relpath=${path%.pro*}
+	 cd $relpath.pro
+	 exec bash
+	 ;;
+
+      r) input="$OPTARG"
+	 path=`pwd`
+	 relpath=${path%.pro*}
+	 cd $relpath.pro/..
+	 if [ -d "$input" ]
+	 then
+	   rm -rf "$input"
+	 else
+	   printf "This .pro directory doest not exist"
+	   exit "$no_dir"
+	 fi
+	 exec bash
 	 ;;
 
       \?) read_help ;;
