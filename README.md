@@ -15,4 +15,8 @@ or on Fedora:
 
 > yum install tree
 
+Dependency: PrecompiledHeader.cmake from https://github.com/larsch/cmake-precompiled-header
+
+PrecompiledHeader.cmake is essential for pch.h concept work in CMake, make sure to put it in ~/ directory, or change path in CMakeLists.txt include(), line 22
+
 Up for further improvements, depending on needs.
