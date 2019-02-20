@@ -19,16 +19,25 @@ function main(){
 	   cd $input.pro
 	   : > "$cmake"
 		  printf "cmake_minimum_required(VERSION 2.8.9)" >> "$cmake"
+		  printf "\ninclude(~/PrecompiledHeader.cmake)" >> "$cmake"
 		  printf "\n\nproject($input)" >> "$cmake"
 		  printf "\n\ninclude_directories(headers)" >> "$cmake"
 		  printf "\n\nfile (GLOB SOURCES \"sources/*.cpp\")" >> "$cmake"
 		  printf "\n\nadd_executable($input \${SOURCES})" >> "$cmake"
+		  printf "\nadd_precompiled_header($input headers/pch.h SOURCE_CXX sources/pch.cpp FORCEINCLUDE)" >> "$cmake"
 	   cd sources 
 	   : > main.cpp
-		  printf "#include <iostream>" >> main.cpp
-		  printf "\n\nint main(){" >> main.cpp  
+ 	   : > pch.cpp
+		  printf "int main(){" >> main.cpp  
 		  printf "\n\n\n}" >> main.cpp
-	   cd ..; 
+		  printf "#include \"pch.h\"" >> pch.cpp
+	   cd ../headers
+	   : > pch.h 
+		  printf "#ifndef PCH_H" >> pch.h
+		  printf "\n#define PCH_H" >> pch.h
+		  printf "\n\n#include <iostream>" >> pch.h
+	 	  printf "\n\n#endif" >> pch.h
+	   cd ..
 	   tree 
 	 else
 	   printf "This directory name already exists. Choose another name."
@@ -103,3 +112,7 @@ function read_help(){
 }
 
 main $@
+
+
+
+
