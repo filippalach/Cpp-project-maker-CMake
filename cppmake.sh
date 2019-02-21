@@ -3,20 +3,24 @@
 function main(){
 
   local class_exists=455
-  local dir_exists=466
+  local pro_exists=466
   local build_nxst=477
   local no_dir=488
   
   local OPTIND=1 opt 
+
   local cmake="CMakeLists.txt"
+  local pchh="pch.h"
+  local pchcpp="pch.cpp"
+  local main="main.cpp"
 
   while getopts "ep:h:mbr:" opt; do
-    case $opt in 
+    case "$opt" in 
       p) input="$OPTARG"
 	 if [ ! -d "$input.pro" ] 
 	 then
 	   mkdir -p $input.pro/{build,headers,sources}
-	   cd $input.pro
+	   cd "$input.pro"
 	   : > "$cmake"
 		  printf "cmake_minimum_required(VERSION 2.8.9)" >> "$cmake"
 		  printf "\ninclude(~/PrecompiledHeader.cmake)" >> "$cmake"
@@ -26,22 +30,22 @@ function main(){
 		  printf "\n\nadd_executable($input \${SOURCES})" >> "$cmake"
 		  printf "\nadd_precompiled_header($input headers/pch.h SOURCE_CXX sources/pch.cpp FORCEINCLUDE)" >> "$cmake"
 	   cd sources 
-	   : > main.cpp
- 	   : > pch.cpp
-		  printf "int main(){" >> main.cpp  
-		  printf "\n\n\n}" >> main.cpp
-		  printf "#include \"pch.h\"" >> pch.cpp
+	   : > "$main"
+ 	   : > "$pchcpp"
+		  printf "int main(){" >> "$main"
+		  printf "\n\n\n}" >> "$main"
+		  printf "#include \"pch.h\"" >> "$pchcpp"
 	   cd ../headers
-	   : > pch.h 
-		  printf "#ifndef PCH_H" >> pch.h
-		  printf "\n#define PCH_H" >> pch.h
-		  printf "\n\n#include <iostream>" >> pch.h
-	 	  printf "\n\n#endif" >> pch.h
+	   : > "$pchh"
+		  printf "#ifndef PCH_H" >> "$pchh"
+		  printf "\n#define PCH_H" >> "$pchh"
+		  printf "\n\n#include <iostream>" >> "$pchh"
+	 	  printf "\n\n#endif" >> "$pchh"
 	   cd ..
 	   tree 
 	 else
-	   printf "This directory name already exists. Choose another name."
-	   exit $dir_exists
+	   printf "This project directory name already exists. Choose another name."
+	   exit "$pro_exists"
 	 fi
 	 ;;
 
@@ -54,12 +58,12 @@ function main(){
 	   cd headers
 	   : > $input.h
 	   printf "#pragma once" >> $input.h
-	   cd ..; cd sources
+	   cd ../sources
 	   : > $input.cpp
 	   printf "#include \"$input.h\"" >> $input.cpp
 	 else
 	   printf "This class already exists in working project or bad directory."
-	   exit $class_exists 
+	   exit "$class_exists"
 	 fi
 	 ;; 
 
@@ -81,7 +85,7 @@ function main(){
 
       b) path=`pwd`
 	 relpath=${path%.pro*}
-	 cd $relpath.pro
+	 cd "$relpath.pro"
 	 exec bash
 	 ;;
 
@@ -107,12 +111,9 @@ function main(){
 
 function read_help(){
   printf "Error: Bad use of parameter"
-  printf "Use -p for project making and -h for adding header"
+  printf "Use -p <name> for project tree making, -h <name> for adding class files, -b to back to main .pro dir"
+  printf "-m to build the project, -r <name.pro> to remove the project"
   printf "Add further -e after -p parameter to end in project dir; ex: cppmake.sh -p Dir -e"
 }
 
 main $@
-
-
-
-
